@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Usuário</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function toggleMain(type, id) {
+        const url = `/${type}/togglemain/${id}`;
+
+        executeFetch(url, "PUT");
+    }
+
+    function deleteData(type, id) {
+        const url = `/${type}/${id}`;
+
+        executeFetch(url, "DELETE");
+    }
+
+    function executeFetch(url, method) {
+        fetch(url, { method })
+        .then(response => {
+                if (!response.ok) {
+                    throw new Error('Falha na atualização');
+                }
+                window.location.reload(); 
+            })
+        .catch(error => { alert('Erro ao atualizar dados. Tente novamente.') });
+    }
+  </script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+        <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Detalhes do Usuário</h2>
+      
+        <div class="mb-4">
+          <p class="text-lg font-semibold">Nome: <%= user.name %></p>
+          <p class="text-sm text-gray-600">CPF: <%= user.cpf %></p>
+          <p class="text-sm text-gray-600">Função: <%= user.role === 'ADMIN' ? 'Administrador' : 'Cliente' %></p>
+        </div>
+      
+        <div class="mt-6">
+          <h3 class="font-semibold text-gray-700">Telefones</h3>
+          <ul class="list-disc pl-5">
+            <% user.phones.forEach((phone, index) => { %>
+              <li class="flex items-center mb-2">
+                +<%= phone.country_code %> (<%= phone.ddd %>) <%= phone.number %>
+                <% if (isMe) { %>
+                  <button onclick="toggleMain('phones', <%= phone.id %>)" class="ml-2 text-yellow-500">
+                    <%= phone.main ? '★' : '☆' %>
+                  </button>
+                  <button onclick="deleteData('phones', <%= phone.id %>)" class="ml-2 text-red-500">
+                    X
+                  </button>
+                <% } else { %>
+                  <div class="ml-2 text-yellow-500">
+                    <%= phone.main ? '★' : '☆' %>
+                  </div>
+                <% } %>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+
+        <hr/>
+      
+        <div class="mt-6">
+          <h3 class="font-semibold text-gray-700">Emails</h3>
+          <ul class="list-disc pl-5">
+            <% user.emails.forEach((email, index) => { %>
+              <li class="flex items-center mb-2">
+                <p><%= email.email %></p>
+                <% if (isMe) { %>
+                  <button onclick="toggleMain('emails', <%= email.id %>)" class="ml-2 text-yellow-500">
+                    <%= email.main ? '★' : '☆' %>
+                  </button>
+                  <button onclick="deleteData('emails', <%= email.id %>)" class="ml-2 text-red-500">
+                    X
+                  </button>
+                <% } else { %>
+                  <div class="ml-2 text-yellow-500">
+                    <%= email.main ? '★' : '☆' %>
+                  </div>
+                <% } %>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+
+        <hr/>
+      
+        <% if (isMe || isAdmin) { %>
+          <div class="mt-6 text-center">
+            <a href="/adduser/<%= user.id %>" class="bg-yellow-500 text-white px-6 py-2 rounded-md">
+              Editar Usuário
+            </a>
+          </div>
+        <% } %>        
+      
+        <% if (isMe) { %>
+            <div class="flex justify-center space-x-4">
+                <button onclick="document.getElementById('edit-phone').classList.toggle('hidden')" class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4">+ Telefone</button>
+                <button onclick="document.getElementById('edit-email').classList.toggle('hidden')" class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4">+ Email</button>
+            </div>
+    
+            <div id="edit-phone" class="hidden mt-4">
+                <form action="/phones" method="POST" class="flex flex-col space-y-2">
+                <div class="flex space-x-2 justify-center">
+                    <input type="text" name="country_code" placeholder="53" required class="w-1/4 px-4 py-2 border rounded-md" />
+                    <input type="text" name="ddd" placeholder="DDD" required class="w-1/4 px-4 py-2 border rounded-md" />
+                    <input type="text" name="number" placeholder="Número" required class="w-1/2 px-4 py-2 border rounded-md" />
+                </div>
+                <input type="submit" value="Adicionar Telefone" class="bg-green-500 text-white px-4 py-2 rounded-md mt-2 mx-auto" />
+                </form>
+            </div>
+    
+            <div id="edit-email" class="hidden mt-4">
+                <form action="/emails" method="POST" class="flex flex-col space-y-2">
+                <input type="text" name="email" required placeholder="Email" class="w-full mt-2 px-4 py-2 border rounded-md" />
+                <input type="submit" value="Adicionar Email" class="bg-green-500 text-white px-4 py-2 rounded-md mt-4 mx-auto" />
+                </form>
+            </div>
+        <% } %>
+
+        <div class="text-center mt-4">
+            <a href="/users" class="text-blue-600 hover:underline">Voltar para a lista de usuários</a>
+        </div>
+      </div>
+  </div>
+
+</body>
+</html>

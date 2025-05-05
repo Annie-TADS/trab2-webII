@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Usuários</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-3xl">
+        <!-- Botão de Logout no canto superior direito -->
+        <div class="absolute top-6 right-6">
+          <a href="/logout" class="bg-red-500 text-white px-6 py-2 rounded-md">
+            Logout
+          </a>
+        </div>
+    
+        <div class="mb-4">
+          <p class="text-lg font-medium text-gray-700">Bem-vindo, <%= currentUser.name %>!</p>
+        </div>
+    
+        <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Lista de Usuários</h2>
+    
+        <table class="min-w-full table-auto">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Nome</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">CPF</th>
+              <th class="px-4 py-2 text-center text-sm font-medium text-green-600">
+                <% if (isAdmin) { %>
+                  <a href="/adduser" class="text-green-600">
+                    +
+                  </a>
+                <% } %>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(user => { %>
+              <tr class="border-b">
+                <td class="px-4 py-2 text-sm text-gray-700">
+                  <a href="/user/<%= user.id %>" class="text-blue-600 hover:underline">
+                    <%= user.name %>
+                  </a>
+                  <% if (user.role === 'ADMIN') { %>
+                    <span class="ml-2 text-yellow-500">👑</span>
+                  <% } %>
+                </td>
+                <td class="px-4 py-2 text-sm text-gray-700" colspan="<%= isAdmin ? 1 : 2 %>"><%= user.cpf %></td>
+                <% if (isAdmin) { %>
+                  <td class="px-4 py-2 text-center text-sm text-red-700">
+                    <a class="text-red-700 cursor-pointer" onclick="deleteUser(<%= user.id %>)">
+                      X
+                    </a>
+                  </td>
+                <% } %>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+    
+        <!-- Paginação -->
+        <div class="mt-6 flex justify-center">
+          <% if (page > 0) { %>
+            <a href="/users?page=<%= page - 1 %>" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Página Anterior</a>
+          <% } %>
+    
+          <% if ((page+1) * 5 < userCount) { %>
+            <a href="/users?page=<%= page + 1 %>" class="bg-blue-500 text-white px-4 py-2 rounded-md ml-2">Próxima Página</a>
+          <% } %>
+        </div>
+    </div>
+      
+
+  <script>
+    function deleteUser(id) {        
+        fetch(`/deleteuser/${id}`, { method: 'DELETE' })
+        .then(response => {
+                if (!response.ok) {
+                    throw new Error('Falha na atualização');
+                }
+                window.location.reload(); 
+            })
+        .catch(error => { alert('Erro ao atualizar dados. Tente novamente.') });
+    }
+  </script>
+</body>
+</html>

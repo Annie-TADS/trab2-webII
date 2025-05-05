@@ -1,5 +1,5 @@
-const db = require('better-sqlite3')('database.db',  {
+import db from 'better-sqlite3'
+
+export default db('database.db',  {
     verbose: console.log
 });
-
-module.exports = db;
