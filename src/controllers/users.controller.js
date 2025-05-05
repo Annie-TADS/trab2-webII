@@ -37,7 +37,7 @@ const usersController = {
         const page = req.query?.page ? parseInt(req.query.page) : 0;
         const USERS_PER_PAGE = 5;
 
-        const users = usersDAO.findAll(USERS_PER_PAGE, page ?? 0);
+        const users = usersDAO.findAll(USERS_PER_PAGE, page * USERS_PER_PAGE);
         const isAdmin = req.session.isAdmin;
         const currentUser = req.session.user;
         const userCount = usersDAO.userCount();
