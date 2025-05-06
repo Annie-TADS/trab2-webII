@@ -34,7 +34,7 @@ const authController = {
             }
         }
 
-        return new Error("CPF ou senha incorretos");
+        throw new Error("CPF ou senha incorretos");
     },
     logout(req, res) {
         req.session.destroy();

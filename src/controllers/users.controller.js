@@ -26,7 +26,9 @@ const usersController = {
         usersDAO.insert(user);
 
         if (!req.session?.isAuth) {
-            req.session.user = {...user, password: undefined};
+            const id = (usersDAO.findByCPF(user.cpf)).id;
+
+            req.session.user = {...user, id, password: undefined};
             req.session.isAuth = true;
             req.session.isAdmin = user.role == userRoles.ADMIN;
         }
@@ -56,6 +58,7 @@ const usersController = {
             phones,
             emails
         };
+        console.log(req.session);
 
         return res.render('user', {user, isMe: user.id == req.session?.user?.id, isAdmin: req.session.isAdmin});
     },
